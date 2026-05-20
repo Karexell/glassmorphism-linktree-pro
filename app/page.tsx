@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { EditorData, TemplateId } from '@/types'
+import { EditorData, FloatingImage, TemplateId } from '@/types'
 import EditorPanel from '@/components/EditorPanel'
 import TemplateSelector from '@/components/TemplateSelector'
 import ExportButton from '@/components/ExportButton'
@@ -30,6 +30,7 @@ const defaultData: EditorData = {
   avatarRadius: 9999,
   iconRadius: 12,
   templateId: 'cosmic',
+  floatingImages: [],
   folders: [
     {
       id: '1',
@@ -61,8 +62,26 @@ const templateComponents: Record<TemplateId, React.ComponentType<any>> = {
 export default function Home() {
   const [data, setData] = useState<EditorData>(defaultData)
   const [panelOpen, setPanelOpen] = useState(true)
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(null)
 
   const TemplateComponent = templateComponents[data.templateId as TemplateId] || CosmicTemplate
+
+  const addFloatingImage = useCallback((img: FloatingImage) => {
+    setData(prev => ({ ...prev, floatingImages: [...prev.floatingImages, img] }))
+    setSelectedImageId(img.id)
+  }, [])
+
+  const removeFloatingImage = useCallback((id: string) => {
+    setData(prev => ({ ...prev, floatingImages: prev.floatingImages.filter(i => i.id !== id) }))
+    if (selectedImageId === id) setSelectedImageId(null)
+  }, [selectedImageId])
+
+  const updateFloatingImage = useCallback((id: string, updates: Partial<FloatingImage>) => {
+    setData(prev => ({
+      ...prev,
+      floatingImages: prev.floatingImages.map(i => i.id === id ? { ...i, ...updates } : i),
+    }))
+  }, [])
 
   return (
     <div className="h-[100dvh] flex flex-col bg-[#030008]">
@@ -130,7 +149,15 @@ export default function Home() {
               className="border-r border-white/[0.04] bg-white/[0.01] overflow-hidden flex-shrink-0 hidden sm:block"
             >
               <div className="w-[380px] h-full">
-                <EditorPanel data={data} onChange={setData} />
+                <EditorPanel
+                  data={data}
+                  onChange={setData}
+                  selectedImageId={selectedImageId}
+                  onSelectImage={setSelectedImageId}
+                  onAddImage={addFloatingImage}
+                  onRemoveImage={removeFloatingImage}
+                  onUpdateImage={updateFloatingImage}
+                />
               </div>
             </motion.aside>
           )}
@@ -150,13 +177,27 @@ export default function Home() {
                   className="min-h-full"
                   data-preview="true"
                 >
-                  <TemplateComponent data={data} />
+                  <TemplateComponent
+                    data={data}
+                    selectedImageId={selectedImageId}
+                    onSelectImage={setSelectedImageId}
+                    onUpdateImage={updateFloatingImage}
+                    onDeleteImage={removeFloatingImage}
+                  />
                 </motion.div>
               </AnimatePresence>
             </div>
           </div>
           <div className="h-[45vh] border-t border-white/[0.04] overflow-hidden">
-            <EditorPanel data={data} onChange={setData} />
+            <EditorPanel
+              data={data}
+              onChange={setData}
+              selectedImageId={selectedImageId}
+              onSelectImage={setSelectedImageId}
+              onAddImage={addFloatingImage}
+              onRemoveImage={removeFloatingImage}
+              onUpdateImage={updateFloatingImage}
+            />
           </div>
         </div>
 
@@ -173,7 +214,12 @@ export default function Home() {
                 className="min-h-full"
                 data-preview="true"
               >
-                <TemplateComponent data={data} />
+                <TemplateComponent
+                  data={data}
+                  selectedImageId={selectedImageId}
+                  onSelectImage={setSelectedImageId}
+                  onUpdateImage={updateFloatingImage}
+                />
               </motion.div>
             </AnimatePresence>
           </div>

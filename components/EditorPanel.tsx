@@ -1,17 +1,23 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { EditorData, LinkItem, LinkFolder } from '@/types'
+import { EditorData, FloatingImage, LinkItem, LinkFolder } from '@/types'
 import { Plus, Trash2, GripVertical, FolderPlus, Folder, ChevronDown, ChevronRight, Image, Video, Repeat, Upload, X } from 'lucide-react'
 import ImageUploader from './ImageUploader'
+import ImageControls from './ImageControls'
 import { useState, useRef } from 'react'
 
 interface Props {
   data: EditorData
   onChange: (data: EditorData) => void
+  selectedImageId?: string | null
+  onSelectImage?: (id: string | null) => void
+  onAddImage?: (img: FloatingImage) => void
+  onRemoveImage?: (id: string) => void
+  onUpdateImage?: (id: string, updates: Partial<FloatingImage>) => void
 }
 
-export default function EditorPanel({ data, onChange }: Props) {
+export default function EditorPanel({ data, onChange, selectedImageId, onSelectImage, onAddImage, onRemoveImage, onUpdateImage }: Props) {
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(data.folders.map(f => f.id)))
   const videoInputRef = useRef<HTMLInputElement>(null)
 
@@ -296,6 +302,24 @@ export default function EditorPanel({ data, onChange }: Props) {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* Images Section */}
+      <section>
+        <h3
+          className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-3"
+          style={{ color: `${accentColor}80` }}
+        >
+          Floating Images
+        </h3>
+        <ImageControls
+          images={data.floatingImages || []}
+          selectedId={selectedImageId || null}
+          onSelect={onSelectImage || (() => {})}
+          onAdd={onAddImage || (() => {})}
+          onRemove={onRemoveImage || (() => {})}
+          onUpdate={onUpdateImage || (() => {})}
+        />
       </section>
 
       {/* Folders Section */}

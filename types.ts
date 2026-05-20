@@ -19,6 +19,16 @@ export interface LinkFolder {
 
 export type TemplateId = 'cosmic' | 'aurora' | 'nebula'
 
+export interface FloatingImage {
+  id: string
+  src: string
+  x: number
+  y: number
+  width: number
+  borderRadius: number
+  opacity: number
+}
+
 export interface EditorData {
   name: string
   bio: string
@@ -38,9 +48,14 @@ export interface EditorData {
   iconRadius: number
   templateId: string
   folders: LinkFolder[]
+  floatingImages: FloatingImage[]
 }
 
 export interface TemplateProps {
   data: EditorData
   isPreview?: boolean
+  selectedImageId?: string | null
+  onSelectImage?: (id: string | null) => void
+  onUpdateImage?: (id: string, updates: Partial<FloatingImage>) => void
+  onDeleteImage?: (id: string) => void
 }
