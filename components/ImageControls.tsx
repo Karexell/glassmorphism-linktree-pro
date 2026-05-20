@@ -24,7 +24,6 @@ export default function ImageControls({ images, selectedId, onSelect, onAdd, onR
       const src = reader.result as string
       const img = new window.Image()
       img.onload = () => {
-        const aspect = img.height / img.width
         const defaultW = 30
         onAdd({
           id: `img-${Date.now()}`,

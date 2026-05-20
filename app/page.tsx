@@ -219,6 +219,7 @@ export default function Home() {
                   selectedImageId={selectedImageId}
                   onSelectImage={setSelectedImageId}
                   onUpdateImage={updateFloatingImage}
+                  onDeleteImage={removeFloatingImage}
                 />
               </motion.div>
             </AnimatePresence>
